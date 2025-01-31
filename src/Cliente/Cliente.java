@@ -7,7 +7,7 @@ import java.net.Socket;
 
 /*
     https://es.stackoverflow.com/questions/422067/cargar-imagen-al-hacer-clic-en-boton
-
+    https://stackoverflow.com/questions/9119481/how-to-present-a-simple-alert-message-in-java
 
  */
 public class Cliente extends JDialog {
@@ -63,6 +63,41 @@ public class Cliente extends JDialog {
                 click(b01);
             }
         });
+        b02.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                click(b02);
+            }
+        });
+        b10.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                click(b10);
+            }
+        });
+        b11.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                click(b11);
+            }
+        });
+        b12.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                click(b12);
+            }
+        });
+        b20.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                click(b20);
+            }
+        });
+        b21.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                click(b21);
+            }
+        });
+        b22.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                click(b22);
+            }
+        });
 
 
         // call onCancel() when cross is clicked
@@ -83,12 +118,13 @@ public class Cliente extends JDialog {
 
     private void click(JButton b){
         try {
-            ObjectOutputStream salida = new ObjectOutputStream(cliente.getOutputStream());
+            DataOutputStream salida = new DataOutputStream(cliente.getOutputStream());
             if(jugador){
-                System.out.println(b.getName());
+
             }
 
-            salida.writeUTF(b.getName());
+            salida.writeUTF(b.getName().toString());
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -103,38 +139,85 @@ public class Cliente extends JDialog {
         Cliente dialog = new Cliente();
         dialog.pack();
         dialog.setVisible(true);
-        //System.exit(0);
         try {
-            ObjectInputStream entrada= new ObjectInputStream(dialog.cliente.getInputStream());
+            DataInputStream entrada = new DataInputStream(dialog.cliente.getInputStream());
             String accion = entrada.readUTF();
             dialog.jugador = entrada.readBoolean();
-            Integer tablero [][];
-            while(accion.equals("/Fin")){
+            String res;
+            boolean ju;
+            while(!accion.equals("/Fin")){
                 accion = entrada.readUTF();
-
+                System.out.println(accion);
                 if(accion.equals("/Correcto")) {
-                    tablero = (Integer[][]) entrada.readObject();
+                    res = entrada.readUTF();
+                    ju = entrada.readBoolean();
 
-                    for (int i = 0; i < tablero.length; i++) {
-                        for (int j = 0; j < tablero[i].length; j++) {
-                            if (tablero[i][j] == 1) {
-                                dialog.b00.setIcon(dialog.cruz);
-                            } else if (tablero[i][j] == 2) {
-                                dialog.b00.setIcon(dialog.circulo);
-                            }
-                        }
-                    }
-                }else{
-                    System.out.println("EORRR");
+                    res(res,dialog,ju);
+                    System.out.println(res);
+
+                    accion = entrada.readUTF();
+                    System.out.println(accion);
+                }else if(accion.equals("/Ocupado")){
+                    JOptionPane.showMessageDialog(null, "La casilla esta llena");
+                }else if(accion.equals("/ERRTurno")){
+                    JOptionPane.showMessageDialog(null, "No es tu turno");
                 }
+            }
 
-                accion = entrada.readUTF();
+            accion = entrada.readUTF();
+
+            System.out.println(accion);
+            if(accion.equals("/Ganar")){
+                JOptionPane.showMessageDialog(null, "Ganaste");
+            }else if(accion.equals("/Perder")){
+
+            }else{
+                JOptionPane.showMessageDialog(null, "Empate");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         }
 
+        System.exit(0);
+    }
+
+    public static void iconos(Cliente dialog,JButton b, boolean jugador){
+        if(jugador){
+            b.setIcon(dialog.cruz);
+        }else{
+            b.setIcon(dialog.circulo);
+        }
+    }
+
+    public static void res(String res,Cliente dialog,boolean ju){
+        switch (res){
+            case "0/0":
+                iconos(dialog,dialog.b00,ju);
+                break;
+            case "0/1":
+                iconos(dialog,dialog.b01,ju);
+                break;
+            case "0/2":
+                iconos(dialog,dialog.b02,ju);
+                break;
+            case "1/0":
+                iconos(dialog,dialog.b10,ju);
+                break;
+            case "1/1":
+                iconos(dialog,dialog.b11,ju);
+                break;
+            case "1/2":
+                iconos(dialog,dialog.b12,ju);
+                break;
+            case "2/0":
+                iconos(dialog,dialog.b20,ju);
+                break;
+            case "2/1":
+                iconos(dialog,dialog.b21,ju);
+                break;
+            case "2/2":
+                iconos(dialog,dialog.b22,ju);
+                break;
+        }
     }
 }

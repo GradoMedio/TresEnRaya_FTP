@@ -3,10 +3,13 @@ package Servidor;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Servidor {
+    public static boolean turno = true;
     public static void main(String[] args) {
         try {
+            ArrayList<Hilo> hilos = new ArrayList<>();
             ServerSocket servidor = new ServerSocket(22222);
 
             while(true){
@@ -18,10 +21,14 @@ public class Servidor {
                 }
 
                 Socket cliente = servidor.accept();
-                Thread hilo = new Thread(new Hilo(cliente,true,tablero));
+                Hilo hi = new Hilo(cliente,true,tablero,hilos);
+                hilos.add(hi);
+                Thread hilo = new Thread(hi);
                 hilo.start();
                 cliente = servidor.accept();
-                Hilo h = new Hilo(cliente,false,tablero);
+                Hilo h = new Hilo(cliente,false,tablero,hilos);
+                hilos.add(h);
+
                 h.run();
 
             }
